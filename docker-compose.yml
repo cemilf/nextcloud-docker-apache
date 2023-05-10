@@ -24,6 +24,11 @@ services:
       - LETSENCRYPT_EMAIL=admin@performans.com
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
+      - SMTP_HOST=mail.domain.com
+      - SMTP_PORT=587
+      - SMTP_NAME=user@domain.com
+      - SMTP_PASSWORD=password
+      - MAIL_FROM_ADDRESS=cloud@domain.com
     env_file:
       - db.env
     depends_on:
@@ -59,34 +64,34 @@ services:
     networks:
       - proxy-tier
 
-  letsencrypt-companion:
-    image: nginxproxy/acme-companion
-    restart: unless-stopped
+  # letsencrypt-companion:
+  #   image: nginxproxy/acme-companion
+  #   restart: unless-stopped
+  #   volumes:
+  #     - certs:/etc/nginx/certs:z
+  #     - acme:/etc/acme.sh:z
+  #     - vhost.d:/etc/nginx/vhost.d:z
+  #     - html:/usr/share/nginx/html:z
+  #     - /var/run/docker.sock:/var/run/docker.sock:z,ro
+  #   networks:
+  #     - proxy-tier
+  #   depends_on:
+  #     - proxy
+
+  # self signed
+  omgwtfssl:
+    image: paulczar/omgwtfssl
+    restart: "no"
     volumes:
-      - certs:/etc/nginx/certs:z
-      - acme:/etc/acme.sh:z
-      - vhost.d:/etc/nginx/vhost.d:z
-      - html:/usr/share/nginx/html:z
-      - /var/run/docker.sock:/var/run/docker.sock:z,ro
+      - certs:/certs
+    environment:
+      - SSL_SUBJECT=cloud.performans.com
+      - CA_SUBJECT=admin@performans.com
+      - SSL_KEY=/certs/cloud.performans.com.key
+      - SSL_CSR=/certs/cloud.performans.com.csr
+      - SSL_CERT=/certs/cloud.performans.com.crt
     networks:
       - proxy-tier
-    depends_on:
-      - proxy
-
-# self signed
-#  omgwtfssl:
-#    image: paulczar/omgwtfssl
-#    restart: "no"
-#    volumes:
-#      - certs:/certs
-#    environment:
-#      - SSL_SUBJECT=servhostname.local
-#      - CA_SUBJECT=my@example.com
-#      - SSL_KEY=/certs/servhostname.local.key
-#      - SSL_CSR=/certs/servhostname.local.csr
-#      - SSL_CERT=/certs/servhostname.local.crt
-#    networks:
-#      - proxy-tier
 
 volumes:
   db:
