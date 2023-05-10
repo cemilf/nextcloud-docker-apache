@@ -64,34 +64,34 @@ services:
     networks:
       - proxy-tier
 
-  # letsencrypt-companion:
-  #   image: nginxproxy/acme-companion
-  #   restart: unless-stopped
-  #   volumes:
-  #     - certs:/etc/nginx/certs:z
-  #     - acme:/etc/acme.sh:z
-  #     - vhost.d:/etc/nginx/vhost.d:z
-  #     - html:/usr/share/nginx/html:z
-  #     - /var/run/docker.sock:/var/run/docker.sock:z,ro
-  #   networks:
-  #     - proxy-tier
-  #   depends_on:
-  #     - proxy
-
-  # self signed
-  omgwtfssl:
-    image: paulczar/omgwtfssl
-    restart: "no"
+  letsencrypt-companion:
+    image: nginxproxy/acme-companion
+    restart: unless-stopped
     volumes:
-      - certs:/certs
-    environment:
-      - SSL_SUBJECT=cloud.performans.com
-      - CA_SUBJECT=admin@performans.com
-      - SSL_KEY=/certs/cloud.performans.com.key
-      - SSL_CSR=/certs/cloud.performans.com.csr
-      - SSL_CERT=/certs/cloud.performans.com.crt
+      - certs:/etc/nginx/certs:z
+      - acme:/etc/acme.sh:z
+      - vhost.d:/etc/nginx/vhost.d:z
+      - html:/usr/share/nginx/html:z
+      - /var/run/docker.sock:/var/run/docker.sock:z,ro
     networks:
       - proxy-tier
+    depends_on:
+      - proxy
+
+  # self signed
+  # omgwtfssl:
+  #   image: paulczar/omgwtfssl
+  #   restart: "no"
+  #   volumes:
+  #     - certs:/certs
+  #   environment:
+  #     - SSL_SUBJECT=cloud.performans.com
+  #     - CA_SUBJECT=admin@performans.com
+  #     - SSL_KEY=/certs/cloud.performans.com.key
+  #     - SSL_CSR=/certs/cloud.performans.com.csr
+  #     - SSL_CERT=/certs/cloud.performans.com.crt
+  #   networks:
+  #     - proxy-tier
 
 volumes:
   db:
